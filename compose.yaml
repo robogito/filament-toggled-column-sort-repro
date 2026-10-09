@@ -1,0 +1,9 @@
+# MariaDB for the reproduction (SQLite hides the bug, see README).
+services:
+  db:
+    image: mariadb:12
+    environment:
+      MARIADB_ROOT_PASSWORD: root
+      MARIADB_DATABASE: repro
+    ports:
+      - "3306:3306"

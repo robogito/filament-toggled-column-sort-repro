@@ -1,0 +1,30 @@
+name: Reproduction test
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    services:
+      db:
+        image: mariadb:12
+        env:
+          MARIADB_ROOT_PASSWORD: root
+          MARIADB_DATABASE: repro
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd "healthcheck.sh --connect --innodb_initialized"
+          --health-interval 5s
+          --health-timeout 5s
+          --health-retries 20
+    steps:
+      - uses: actions/checkout@v5
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          extensions: intl, pdo_mysql
+      - run: composer install --no-interaction --no-progress
+      - run: php artisan test tests/Feature/SortByToggledHiddenCountColumnTest.php
